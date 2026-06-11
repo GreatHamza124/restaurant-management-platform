@@ -1,9 +1,24 @@
 import { supabase } from '@/lib/supabase'
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const date = url.searchParams.get('date')
+  const session = url.searchParams.get('session')
+
+  if (date) {
+    let q = supabase
+      .from('bookings')
+      .select('table_name')
+      .eq('booking_date', date)
+      .neq('status', 'cancelled')
+    if (session) q = q.eq('session', session)
+    const { data } = await q
+    return Response.json((data ?? []).map((b) => b.table_name))
+  }
+
   const { data } = await supabase
     .from('bookings')
-    .select('*, booking_items(*, menu_items(name, selling_price))')
+    .select('*')
     .order('booking_date', { ascending: false })
   return Response.json(data ?? [])
 }
@@ -15,37 +30,48 @@ interface OrderItem {
 }
 
 export async function POST(request: Request) {
-  const { customerName, customerEmail, partySize, bookingDate, bookingTime, items } = await request.json()
+  const { customerName, customerEmail, customerId, partySize, bookingDate, bookingTime, tableName, items, session } =
+    await request.json()
 
-  const totalAmount = items.reduce((sum: number, item: OrderItem) =>
-    sum + (item.price * item.quantity), 0)
+  const PRICE_PER_SEAT = 5
+  const orderItems: OrderItem[] = items ?? []
+  const foodTotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const totalAmount = partySize * PRICE_PER_SEAT + foodTotal
 
-  const { data: booking, error } = await supabase
+  const { data, error } = await supabase
     .from('bookings')
     .insert({
       customer_name: customerName,
       customer_email: customerEmail,
+      customer_id: customerId ?? null,
       party_size: partySize,
       booking_date: bookingDate,
       booking_time: bookingTime,
+      table_name: tableName,
       total_amount: totalAmount,
-      status: 'confirmed'
+      status: 'confirmed',
+      session: session ?? null,
     })
     .select()
     .single()
 
-  if (error) return Response.json({ error }, { status: 500 })
+  if (error) return Response.json({ error: error.message }, { status: 500 })
 
-  if (items.length > 0) {
+  if (orderItems.length > 0) {
     await supabase.from('booking_items').insert(
-      items.map((item: OrderItem) => ({
-        booking_id: booking.id,
-        menu_item_id: item.id,
-        quantity: item.quantity,
-        price_at_time: item.price
+      orderItems.map((i) => ({
+        booking_id: data.id,
+        menu_item_id: i.id,
+        quantity: i.quantity,
+        price_at_time: i.price,
       }))
     )
   }
 
-  return Response.json(booking)
+  // Increment customer visit count
+  if (customerId) {
+    await supabase.rpc('increment_visit_count', { customer_id: customerId })
+  }
+
+  return Response.json(data)
 }
