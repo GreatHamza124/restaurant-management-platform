@@ -1,25 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Restaurant Management Platform
 
-## Getting Started
+A full-stack restaurant management web app with a live analytics dashboard, table booking system, and dynamic menu with real-time price management.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Built to give restaurant owners a single platform to manage their business — track performance through live charts, handle customer bookings with time-slot management, and update menu prices in real time. Market prices are integrated into the menu so ingredient costs and selling prices stay in sync automatically.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Technologies Used
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js
+- React
+- TypeScript
+- Supabase (PostgreSQL + Auth)
+- Recharts
+- Tailwind CSS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
 
+- Analytics Dashboard — live charts showing sales, revenue, and booking trends powered by Recharts
+- Booking System — customers can book a time slot; staff can view and manage all reservations
+- Dynamic Menu — menu prices editable directly in the app, with live market price integration
+- Authentication — user auth handled by Supabase with role-based access
+
+## How to Run
+
+1. Clone the repo
+   git clone https://github.com/yourusername/restaurant-management-platform
+
+2. Install dependencies
+   npm install
+
+3. Set up environment variables — create a .env.local file in the root with:
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+4. Run the development server
+   npm run dev
+
+5. Open http://localhost:3000
+
+## What I Learned
+
+This project gave me hands-on experience building a full-stack application end to end — designing a relational database schema in Supabase, managing auth, fetching and displaying live data with Recharts, and building a clean UI with Tailwind CSS and TypeScript.
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -29,8 +51,3 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
