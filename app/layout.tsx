@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+/*import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -28,6 +28,46 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+      </body>
+    </html>
+  );
+}
+
+import Navbar from '@/components/navbar'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body style={{ margin: 0, fontFamily: 'sans-serif', backgroundColor: '#f5f5f5' }}>
+        <Navbar />
+        <main style={{ padding: '30px 40px' }}>
+          {children}
+        </main>
+      </body>
+    </html>
+  )
+}*/
+
+import type { Metadata } from "next";
+import Navbar from "@/components/navbar";
+
+export const metadata: Metadata = {
+  title: "RestaurantOS",
+  description: "Restaurant management system",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body style={{ margin: 0, fontFamily: 'sans-serif', backgroundColor: '#f5f5f5' }}>
+        <Navbar />
+        <main style={{ padding: '30px 40px' }}>
+          {children}
+        </main>
       </body>
     </html>
   );

@@ -1,4 +1,4 @@
-import Image from "next/image";
+/*import Image from "next/image";
 
 export default function Home() {
   return (
@@ -62,4 +62,94 @@ export default function Home() {
       </main>
     </div>
   );
+}*/
+'use client'
+import { useState, useEffect } from 'react'
+import StatCard from '@/components/StatCard'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer
+} from 'recharts'
+
+interface DashboardData {
+  totalRevenue: number
+  totalExpenses: number
+  totalProfit: number
+  chartData: {
+    date: string
+    revenue: number
+    expenses: number
+  }[]
+  todayBookings: number
+  todayCovers: number
+}
+
+export default function Dashboard() {
+  const [data, setData] = useState<DashboardData | null>(null)
+
+  useEffect(() => {
+    async function load() {
+      const res = await fetch('/api/dashboard')
+      const json = await res.json()
+      setData(json)
+    }
+    load()
+  }, [])
+
+  if (!data) return <p>Loading dashboard...</p>
+
+  return (
+    <div>
+      <h1 style={{ marginBottom: '24px' }}>Dashboard</h1>
+
+      {/* Stat Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '30px' }}>
+        <StatCard
+          title="Revenue (7 days)"
+          value={`$${data.totalRevenue.toLocaleString()}`}
+          subtitle="From completed bookings"
+          color="#22c55e"
+        />
+        <StatCard
+          title="Expenses (7 days)"
+          value={`$${data.totalExpenses.toLocaleString()}`}
+          subtitle="Est. food and labour costs"
+          color="#ef4444"
+        />
+        <StatCard
+          title="Profit (7 days)"
+          value={`$${data.totalProfit.toLocaleString()}`}
+          subtitle={`${Math.round((data.totalProfit / data.totalRevenue) * 100)}% margin`}
+          color="#3b82f6"
+        />
+        <StatCard
+          title="Today's Bookings"
+          value={`${data.todayBookings}`}
+          subtitle={`${data.todayCovers} covers expected`}
+          color="#8b5cf6"
+        />
+      </div>
+
+      {/* Revenue vs Expenses Chart */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <h2 style={{ marginTop: 0 }}>Revenue vs Expenses — Last 7 Days</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data.chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
+            <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
+            <Legend />
+            <Bar dataKey="revenue" name="Revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="expenses" name="Expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  )
 }
